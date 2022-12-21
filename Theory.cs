@@ -66,14 +66,21 @@ namespace _5th_Lab
         #endregion
 
         #region LVL2_ex_6
-
         static void LVL2_ex_6()
         {
-            int[] list = new int[] { 4, 1, 2, 3, 9, 0, 5 };
-            DeleteMax(list);
-            for (int i = 0; i < list.Length - 1; i++)
+            int[] listA = new int[] { 4, 1, 2, 3, 9, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0};
+            int[] listB = new int[] { 4, 1, 2, 3, 9, 0, 5, 12 };
+            DeleteMax(listA);
+            DeleteMax(listB);
+            int c = 0;
+            for(int i = listA.Length - listB.Length - 1; i < listA.Length && c < listB.Length; i++)
             {
-                Console.Write(list[i] + "; ");
+                listA[i] = listB[c];
+                c++;
+            }
+            for (int i = 0; i < listA.Length - 1; i++)
+            {
+                Console.Write(listA[i] + "; ");
             }
         }
 
@@ -85,6 +92,7 @@ namespace _5th_Lab
             {
                 if (list[i] > max) { max = list[i]; index = i; }
             }
+            list[index] = 0;
             for (int i = index; i < list.Length - 1; i++)
             {
                 list[i] = list[i + 1];
@@ -145,7 +153,7 @@ namespace _5th_Lab
             int minIndex = 0;
             for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < i; j++)
+                for (int j = 0; j <= i; j++)
                 {
                     if (matrix13[i, j] > max)
                     {
@@ -162,16 +170,32 @@ namespace _5th_Lab
                     }
                 }
             }
-            DeleteColumn(minIndex, matrix13, rows, cols);
-            DeleteColumn(maxIndex, matrix13, rows, cols);
-            cols = cols - 2;
-            for (int i = 0; i < rows; i++)
+            if (maxIndex == minIndex)
             {
-                for (int j = 0; j < cols; j++)
+                DeleteColumn(minIndex, matrix13, rows, cols);
+                cols = cols - 1;
+                for (int i = 0; i < rows; i++)
                 {
-                    Console.Write(matrix13[i, j] + " ");
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Console.Write(matrix13[i, j] + " ");
+                    }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
+            }
+            else
+            {
+                DeleteColumn(minIndex, matrix13, rows, cols);
+                DeleteColumn(maxIndex, matrix13, rows, cols);
+                cols = cols - 2;
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Console.Write(matrix13[i, j] + " ");
+                    }
+                    Console.WriteLine();
+                }
             }
             return 0;
         }
@@ -192,6 +216,8 @@ namespace _5th_Lab
         #region LVL2_ex_23 (tackle later)
 
         static void LVL2_ex_23()
+        {
+            static void LVL2_ex_23()
         {
             Matrix matrix1 = new Matrix(5, 5);
             Matrix matrix2 = new Matrix(5, 5);
@@ -224,7 +250,7 @@ namespace _5th_Lab
             matrix1.Print();
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Matrix 2 (changed)");
-            matrix1.Print();
+            matrix2.Print();
             Console.WriteLine("------------------------------------------");
         }
 
@@ -240,24 +266,25 @@ namespace _5th_Lab
                     if (matrix[i, j] > max && list.Contains(matrix[i, j]) == false)
                     {
                         max = matrix[i, j];
-                        indexOfMax = (i, j);
-                        list.Add(matrix[i, j]);
+                        indexOfMax = (i, j);   
                     }
                 }
-                if(list.Count == listLength)
-                {
-                    indexOfMax = (0, 0);
-                    list.Add(matrix[0, 0]);
-                }
-                max -= 1;
             }
+            list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
             return indexOfMax;
         }
         static void DoubleMax(int[,] list, (int, int)[] indexes)
         {
             for(int i = 0; i < indexes.Length; i++)
             {
-                list[indexes[i].Item1, indexes[i].Item2] *= 2;
+                if (list[indexes[i].Item1, indexes[i].Item2] > 0)
+                {
+                    list[indexes[i].Item1, indexes[i].Item2] *= 2;
+                }
+                else
+                {
+                    list[indexes[i].Item1, indexes[i].Item2] *= -2;
+                }
             }
         }
         
@@ -267,9 +294,13 @@ namespace _5th_Lab
             {
                 for(int j = 0; j < list.GetLength(1); j++)
                 {
-                    if (!max.Contains(list[i, j]))
+                    if (!max.Contains(list[i, j] / 2) && list[i, j] > 0)
                     {
                         list[i, j] /= 2;
+                    }
+                    else if (!max.Contains(list[i,j]) && list[i, j] < 0)
+                    {
+                        list[i, j] *= 2;
                     }
                 }
             }
