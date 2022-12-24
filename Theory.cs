@@ -170,6 +170,11 @@ namespace _5th_Lab
                     }
                 }
             }
+            if(rows == 2 && cols == 2)
+            {
+                Console.WriteLine("Empty");
+                return 0;
+            }
             if (maxIndex == minIndex)
             {
                 DeleteColumn(minIndex, matrix13, rows, cols);
@@ -210,14 +215,11 @@ namespace _5th_Lab
                 }
             }
         }
-
         #endregion
 
         #region LVL2_ex_23 (tackle later)
 
         static void LVL2_ex_23()
-        {
-            static void LVL2_ex_23()
         {
             Matrix matrix1 = new Matrix(5, 5);
             Matrix matrix2 = new Matrix(5, 5);
@@ -244,7 +246,7 @@ namespace _5th_Lab
             }
             DoubleMax(matrix1.CreatedMatrix, elementsToChange1);
             HalfOthers(matrix1.CreatedMatrix, alreadyMax1);
-            DoubleMax(matrix2.CreatedMatrix, elementsToChange1);
+            DoubleMax(matrix2.CreatedMatrix, elementsToChange2);
             HalfOthers(matrix2.CreatedMatrix, alreadyMax2);
             Console.WriteLine("Matrix 1 (changed)");
             matrix1.Print();
@@ -258,6 +260,7 @@ namespace _5th_Lab
         {
             int listLength = list.Count;
             int max = matrix[0,0];
+            int maxBuffer = matrix[0,0];
             (int, int) indexOfMax = (0, 0);
             for(int i = 0; i < matrix.GetLength(0); i++)
             {
@@ -270,7 +273,14 @@ namespace _5th_Lab
                     }
                 }
             }
-            list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
+            if (maxBuffer == max)
+            {
+                list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
+            }
+            else
+            {
+                list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
+            }
             return indexOfMax;
         }
         static void DoubleMax(int[,] list, (int, int)[] indexes)
@@ -283,7 +293,7 @@ namespace _5th_Lab
                 }
                 else
                 {
-                    list[indexes[i].Item1, indexes[i].Item2] *= -2;
+                    list[indexes[i].Item1, indexes[i].Item2] /= 2;
                 }
             }
         }
@@ -298,7 +308,7 @@ namespace _5th_Lab
                     {
                         list[i, j] /= 2;
                     }
-                    else if (!max.Contains(list[i,j]) && list[i, j] < 0)
+                    else if (!max.Contains(list[i,j] * 2) && list[i, j] < 0)
                     {
                         list[i, j] *= 2;
                     }
