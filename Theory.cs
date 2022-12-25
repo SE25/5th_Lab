@@ -226,8 +226,8 @@ namespace _5th_Lab
             matrix1.CreateMatrix();
             matrix2.CreateMatrix();
             int numberOfMaxElements = 5;
-            (int, int)[] elementsToChange1 = new (int, int)[numberOfMaxElements];
-            (int, int)[] elementsToChange2 = new (int, int)[numberOfMaxElements];
+            List<(int, int)> elementsToChange1 = new List<(int, int)>(numberOfMaxElements);
+            List<(int, int)> elementsToChange2 = new List<(int, int)>(numberOfMaxElements);
             List<int> alreadyMax1 = new List<int>();
             List<int> alreadyMax2 = new List<int>();
             Console.WriteLine("Matrix 1");
@@ -236,18 +236,16 @@ namespace _5th_Lab
             Console.WriteLine("Matrix 2");
             matrix1.Print();
             Console.WriteLine("------------------------------------------");
-            for (int i = 0; i < numberOfMaxElements; i++)
+            for(int i = 0; i < numberOfMaxElements; i++)
             {
-                elementsToChange1[i] = Max(matrix1.CreatedMatrix, alreadyMax1);
+                elementsToChange1.Add(Max(matrix1.CreatedMatrix, alreadyMax1));
             }
-            for (int i = 0; i < numberOfMaxElements; i++)
+            for(int i = 0; i < numberOfMaxElements; i++)
             {
-                elementsToChange2[i] = Max(matrix2.CreatedMatrix, alreadyMax2);
+                elementsToChange2.Add(Max(matrix2.CreatedMatrix, alreadyMax2));
             }
-            DoubleMax(matrix1.CreatedMatrix, elementsToChange1);
-            HalfOthers(matrix1.CreatedMatrix, alreadyMax1);
-            DoubleMax(matrix2.CreatedMatrix, elementsToChange2);
-            HalfOthers(matrix2.CreatedMatrix, alreadyMax2);
+            ChangeMatrix(matrix1.CreatedMatrix, elementsToChange1);
+            ChangeMatrix(matrix2.CreatedMatrix, elementsToChange2);
             Console.WriteLine("Matrix 1 (changed)");
             matrix1.Print();
             Console.WriteLine("------------------------------------------");
@@ -258,13 +256,11 @@ namespace _5th_Lab
 
         static (int, int) Max(int[,] matrix, List<int> list)
         {
-            int listLength = list.Count;
-            int max = matrix[0,0];
-            int maxBuffer = matrix[0,0];
+            int max = -1000;
             (int, int) indexOfMax = (0, 0);
             for(int i = 0; i < matrix.GetLength(0); i++)
             {
-                for(int j = 0; j < matrix.GetLength(1); j++)
+                for(int j = 0;j < matrix.GetLength(1); j++)
                 {
                     if (matrix[i, j] > max && list.Contains(matrix[i, j]) == false)
                     {
@@ -273,42 +269,30 @@ namespace _5th_Lab
                     }
                 }
             }
-            if (maxBuffer == max)
-            {
-                list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
-            }
-            else
-            {
-                list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
-            }
+            list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
             return indexOfMax;
         }
-        static void DoubleMax(int[,] list, (int, int)[] indexes)
+        static void ChangeMatrix(int[,] list, List<(int, int)> indexes)
         {
-            for(int i = 0; i < indexes.Length; i++)
-            {
-                if (list[indexes[i].Item1, indexes[i].Item2] > 0)
-                {
-                    list[indexes[i].Item1, indexes[i].Item2] *= 2;
-                }
-                else
-                {
-                    list[indexes[i].Item1, indexes[i].Item2] /= 2;
-                }
-            }
-        }
-        
-        static void HalfOthers(int[,] list, List<int> max)
-        {
-            for(int i = 0; i < list.GetLength(0); i++)
+            (int, int) tuple;
+            for (int i = 0; i < list.GetLength(0); i++)
             {
                 for(int j = 0; j < list.GetLength(1); j++)
                 {
-                    if (!max.Contains(list[i, j] / 2) && list[i, j] > 0)
+                    tuple = (i, j);
+                    if (indexes.Contains(tuple) && list[i, j] > 0)
+                    {
+                        list[i, j] *= 2;
+                    }
+                    else if (indexes.Contains(tuple) && list[i, j] < 0)
                     {
                         list[i, j] /= 2;
                     }
-                    else if (!max.Contains(list[i,j] * 2) && list[i, j] < 0)
+                    else if(list[i, j] > 0)
+                    {
+                        list[i, j] /= 2;
+                    }
+                    else
                     {
                         list[i, j] *= 2;
                     }
