@@ -149,8 +149,8 @@ namespace _5th_Lab
             }
             int max = matrix13[0, 0];
             int maxIndex = 0;
-            int min = matrix13[0, 0];
-            int minIndex = 0;
+            int min = matrix13[0, cols - 1];
+            int minIndex = cols - 1;
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j <= i; j++)
@@ -215,32 +215,33 @@ namespace _5th_Lab
                 }
             }
         }
+
         #endregion
 
         #region LVL2_ex_23 (tackle later)
 
         static void LVL2_ex_23()
         {
-            Matrix matrix1 = new Matrix(5, 5);
-            Matrix matrix2 = new Matrix(5, 5);
+            Matrix matrix1 = new Matrix(6, 6);
+            Matrix matrix2 = new Matrix(6, 6);
             matrix1.CreateMatrix();
             matrix2.CreateMatrix();
             int numberOfMaxElements = 5;
             List<(int, int)> elementsToChange1 = new List<(int, int)>(numberOfMaxElements);
             List<(int, int)> elementsToChange2 = new List<(int, int)>(numberOfMaxElements);
-            List<int> alreadyMax1 = new List<int>();
-            List<int> alreadyMax2 = new List<int>();
+            List<(int, int)> alreadyMax1 = new List<(int, int)>();
+            List<(int, int)> alreadyMax2 = new List<(int, int)>();
             Console.WriteLine("Matrix 1");
             matrix1.Print();
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Matrix 2");
-            matrix1.Print();
+            matrix2.Print();
             Console.WriteLine("------------------------------------------");
             for(int i = 0; i < numberOfMaxElements; i++)
             {
                 elementsToChange1.Add(Max(matrix1.CreatedMatrix, alreadyMax1));
             }
-            for(int i = 0; i < numberOfMaxElements; i++)
+            for (int i = 0; i < numberOfMaxElements; i++)
             {
                 elementsToChange2.Add(Max(matrix2.CreatedMatrix, alreadyMax2));
             }
@@ -254,22 +255,24 @@ namespace _5th_Lab
             Console.WriteLine("------------------------------------------");
         }
 
-        static (int, int) Max(int[,] matrix, List<int> list)
+        static (int, int) Max(int[,] matrix, List<(int, int)> list)
         {
             int max = -1000;
             (int, int) indexOfMax = (0, 0);
+            (int, int) buffer = (0, 0);
             for(int i = 0; i < matrix.GetLength(0); i++)
             {
                 for(int j = 0;j < matrix.GetLength(1); j++)
                 {
-                    if (matrix[i, j] > max && list.Contains(matrix[i, j]) == false)
+                    buffer = (i, j);
+                    if (matrix[i, j] > max && list.Contains(buffer) == false)
                     {
                         max = matrix[i, j];
                         indexOfMax = (i, j);   
                     }
                 }
             }
-            list.Add(matrix[indexOfMax.Item1, indexOfMax.Item2]);
+            list.Add(indexOfMax);
             return indexOfMax;
         }
         static void ChangeMatrix(int[,] list, List<(int, int)> indexes)
