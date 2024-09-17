@@ -1,233 +1,601 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
+using System.Linq;
 
 namespace _5th_Lab
 {
     class Program
     {
-        #region How to use Delegate. Example 1.
-        delegate int LinkUsing(int[] arr); // create a delegate with type: return int value, input: 1st param: int[]
-        static int GetLength(int[] arr) // create a 1st method with same params as ddelegate has
-        {
-            return arr.Length;
-        }
-        static int GetSum(int[] arr) // create a 2nd method with same params as ddelegate has
-        {
-            int sum = 0;
-            foreach (int element in arr)
-                sum += element;
-            return sum;
-        }
-        static int Calculate(LinkUsing func, int[] arr, int count)
-        {
-            int total = 0;
-            for (int i = 0; i < count; i++)
-            {
-                total += func(arr);
-            }
-            return total;
-        }
-        #endregion
-
-        #region How to use Delegate. Example 2.
-        delegate void SequenceUsing(int[] arr); // create a delegate with type: return void (!!!), input: 1st param: int[]
-        static void Say(int[] arr) // create a 1st method with same params as ddelegate has
-        {
-            Console.WriteLine($"It is a {arr.GetType().ToString()}");
-        }
-        static void Read(int[] arr) // create a 2nd method with same params as ddelegate has
-        {
-            foreach (int element in arr)
-                Console.Write($"{element} ");
-            Console.WriteLine();
-        }
-        static void Analyze(int[] arr, int start, int end)
-        {
-            int[] part = new int[end-start];
-            int k = 0;
-            for (int i = start; i < end; i++)
-            {
-                part[k] = arr[i];
-                k++;
-            }
-            SequenceUsing severalWorks = Say; // if we call the severalWorks after that, it would call Say(int[] arr);
-            severalWorks += Read; // if we call the severalWorks after that, it would call Say(int[] arr) and next Read(int[] arr);
-            try
-            {
-                severalWorks -= Say; // if we call the severalWorks after that, it would call Read(int[] arr) only;
-            }
-            catch { }
-            severalWorks += Say; // if we call the severalWorks after that, it would call Read(int[] arr) and next Say(int[] arr);
-            
-            severalWorks(part); // call it (2 methods).
-            /*
-             * But know, that if the methods return some value, you will get only last result!!! so better use delegates with void methods in that way!
-             */
-        }
-        #endregion
-        #region How to use Delegate. Example 3.
-        delegate double ChooseUsage(int[,] matrix, int row); // create a delegate with type: return double value, input: 2 param: int[,], int
-        static double GetAverageInTheRow(int[,] matrix, int row)
-        {
-            double avg = 0;
-            int columns = matrix.GetLength(1);
-            for (int i = 0; i < columns; i++)
-                avg += matrix[row, i] / columns;
-            return avg;
-        }
-        static double GetAverageInTheColumn(int[,] matrix, int column)
-        {
-            double avg = 0;
-            int rows = matrix.GetLength(0);
-            for (int i = 0; i < rows; i++)
-                avg += matrix[i, column] / rows;
-            return avg;
-        }
-        #endregion
-
-        static int PolymorphMethod() { return 0; }
-        static int PolymorphMethod(int number) { return number; }
-        static int PolymorphMethod(ref int number) { return number; }   // either with modificator ref - you send a link to your variable
-                                                                        //    static int PolymorphMethod(out int number) { return number; } // or out - you get additional variale (use if you need >1 variable to return. But tuple is better)
-        static int PolymorphMethod(double anotherNumber) { return (int)anotherNumber; }
-        static int PolymorphMethod<T>(T yourType) { return yourType.GetHashCode(); } // general type
-
-        //     static T PolymorphMethod<T>(T yourType) { return number; } - cannot create since there is method with same input params
-        static double PolymorphMethod(int count, double[] array)
-        {
-            var sum = 0.0;
-            foreach (double value in array)
-            {
-                sum += value;
-            }
-            return sum + count;
-        }
-
-        static bool Compare(int left, int right) => left > right; // => it is lambda operator the same as { return }
-        static bool Compare(double left, double right) => left > right;
-
         static void Main(string[] args)
         {
+            //LVL1_ex_1();
+            //LVL1_ex_2();
+            //LVL2_ex_6();
+            //LVL2_ex_10();
+            //LVL2_ex_23(); 
+            //LVL3_ex_6();
+            //LVL3_ex_4();
+        }
 
-            Console.WriteLine("Delegate example 1");
-            int[] array = new int[5] { 1, 0, 2, 0, 5 };
-            Calculate(GetLength, array, 3);
-            Calculate(GetSum, array, 3);
-
-            Console.WriteLine("Delegate example 2");
-
-            Analyze(new int[5] { 1, 2, 3, 4, 5 }, 2, 4);
-
-            Console.WriteLine("Delegate example 3");
-
-            ChooseUsage select;
-            if (int.TryParse(Console.ReadLine(), out int sample))
-                select = GetAverageInTheRow;
-            else
-                select = GetAverageInTheColumn;
-            Console.WriteLine($"Average = {select(new int[2, 3] { { 1, 2, 0 }, { 11, 3, 9 } }, 1)}");
-
-            return;
-            #region OOP principles
-
-            /* You operation mith moduls. Modul can work with data he get or keep inside. 
-             * Moduls of higher lvl hould not know about lower ones.
-             * So your code will be safe and logical.
-             * 
-             * 
-             * What are you need?
-             * 
-             * Abstraction - noone shuld know HOW another modul (class / method) works.
-             * You have to provide input value and get the output.
-             * User interface shouldn't affect on the system's work.
-             * Also realization should not change the pattern (abstract scheme)
-             * 
-             * Encapsulation - do not provide more than asked.
-             * Another class or method shouldn't know about any field or method in your object (class, structure and so on) except you provide to it.
-             * Group your data in a single object. One object (entity) should know and do only that things that incuded or were gotten outside.
-             * 
-             * Inheritance - Inheritance is the method of acquiring features of the existing class into the new class with additional properties or methods.
-             * Also it is allow us to reach better incapsulation (up-cast).
-             * Inheritance can be from 1 to many (classes / interfaces) or from many to one (interfaces only). 
-             * So we can create an object (entity) with such properties we need and agregate in with another objects that have the same property.
-             * 
-             * Polymorphism - the most essential concept which allow any object or method has more than one name associated with it. And it allow your code be more flexible.
-             * Difference can be in the type it use, parameters it get.
-             * 
-             * In that lab you will have an acquaintance with polymorphism
-             * 
-             */
-
-            Console.WriteLine(PolymorphMethod());
-
-            Console.WriteLine(PolymorphMethod(10));
-
-            Console.WriteLine(PolymorphMethod(2.56));
-
-            Console.WriteLine(PolymorphMethod("Abracadabra")); // general type will be called, because no another method that suit to this type
-
-            Console.WriteLine(PolymorphMethod(5, new[] { 0.1223, 1.2, 8.9, -1.5 }));
-
-            #endregion
-
-            #region DRY - don't repeat yourself
-
-            /* Very simple advice :)
-             * You already did it, using cycle, for example instead maing calculation on each line
-             * 
-             * If you see that in your program is repeat, make a separate method and call it when it needs.
-             */
-
-            int numerator = 1, denominator = 1;
-
-
-            double sum = 0, average = 0;
-
-            if (numerator > denominator)
+        #region LVL1_ex_1
+        static void LVL1_ex_1()
+        {
+            Console.WriteLine(Assemble(5, 8));
+            Console.WriteLine(Assemble(5, 10));
+            Console.WriteLine(Assemble(5, 11));
+        }
+        static int Assemble(int teammatesNumber, int candidatesNumber)
+        {
+            if (teammatesNumber > 0 && candidatesNumber > 0)
             {
-                Console.WriteLine(true);
+                int numberOfCombinations = Factorial(candidatesNumber) / (Factorial(teammatesNumber) * Factorial(candidatesNumber - teammatesNumber));
+                return numberOfCombinations;
+            }
+            else return 0;
+        }
+
+        static int Factorial(int n)
+        {
+            for (int i = n - 1; i > 0; i--)
+            {
+                n *= i;
+            }
+            return n;
+        }
+        #endregion
+
+        #region LVL1_ex_2
+
+        static void LVL1_ex_2()
+        {
+            Triangle triangle1 = new Triangle(5, 6, 9);
+            Triangle triangle2 = new Triangle(4, 5, 9);
+            double area1 = triangle1.Area;
+            double area2 = triangle2.Area;
+            Console.WriteLine($"Triangle #{Max(area1, area2)}");
+        }
+        static string Max(double a, double b)
+        {
+            if (a > b) return "1";
+            else return "2";
+        }
+
+
+        #endregion
+
+        #region LVL2_ex_6
+        static void LVL2_ex_6()
+        {
+            int[] listA = new int[] { 4, 1, 2, 3, 9, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0};
+            int[] listB = new int[] { 4, 1, 2, 3, 9, 0, 5, 12 };
+            DeleteMax(listA);
+            DeleteMax(listB);
+            int c = 0;
+            for(int i = listA.Length - listB.Length - 1; i < listA.Length && c < listB.Length; i++)
+            {
+                listA[i] = listB[c];
+                c++;
+            }
+            for (int i = 0; i < listA.Length - 1; i++)
+            {
+                Console.Write(listA[i] + "; ");
+            }
+        }
+
+        static void DeleteMax(int[] list)
+        {
+            int index = 0;
+            int max = list[0];
+            for (int i = 0; i < list.Length; i++)
+            {
+                if (list[i] > max) { max = list[i]; index = i; }
+            }
+            list[index] = 0;
+            for (int i = index; i < list.Length - 1; i++)
+            {
+                list[i] = list[i + 1];
+            }
+        }
+        #endregion
+
+        #region LVL2_ex_10
+
+        static void LVL2_ex_10()
+        {
+            Task();
+        }
+        static int Task()
+        {
+            int rows = 0;
+            int cols = 0;
+            Console.Write("Enter the number of rows: ");
+            if (int.TryParse(Console.ReadLine(), out rows))
+            {
+                Console.Write("Enter the number of cols: ");
+                if (int.TryParse(Console.ReadLine(), out cols))
+                {
+                    Console.WriteLine();
+                }
+            }
+            else Console.WriteLine("Enter correct data!");
+            if (rows <= 0 || cols <= 0) return 0;
+            int[,] matrix13 = new int[rows, cols];
+            for (int i = 0; i < rows; i++)
+            {
+                Console.WriteLine($"Rows {i + 1}");
+                string[] rowElements = Console.ReadLine().Split(' ');
+                if (rowElements.Length == cols)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        if (int.TryParse(rowElements[j], out int element))
+                        {
+                            matrix13[i, j] = element;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Incorrect data");
+                            return 0;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Not enough elements");
+                    return 0;
+                }
+            }
+            int max = matrix13[0, 0];
+            int maxIndex = 0;
+            int min = matrix13[0, cols - 1];
+            int minIndex = cols - 1;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    if (matrix13[i, j] > max)
+                    {
+                        max = matrix13[i, j];
+                        maxIndex = j;
+                    }
+                }
+                for (int j = i + 1; j < cols; j++)
+                {
+                    if (matrix13[i, j] < min)
+                    {
+                        min = matrix13[i, j];
+                        minIndex = j;
+                    }
+                }
+            }
+            if(rows == 2 && cols == 2)
+            {
+                Console.WriteLine("Empty");
+                return 0;
+            }
+            if (maxIndex == minIndex)
+            {
+                DeleteColumn(minIndex, matrix13, rows, cols);
+                cols = cols - 1;
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Console.Write(matrix13[i, j] + " ");
+                    }
+                    Console.WriteLine();
+                }
             }
             else
             {
-                Console.WriteLine(false);
+                DeleteColumn(minIndex, matrix13, rows, cols);
+                DeleteColumn(maxIndex, matrix13, rows, cols);
+                cols = cols - 2;
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Console.Write(matrix13[i, j] + " ");
+                    }
+                    Console.WriteLine();
+                }
             }
-
-            if (sum > average)
+            return 0;
+        }
+        static void DeleteColumn(int index, int[,] matrix, int rows, int cols)
+        {
+            cols = cols - 1;
+            for (int i = 0; i < rows; i++)
             {
-                Console.WriteLine(true);
+                for (int j = index; j < cols; j++)
+                {
+                    matrix[i, j] = matrix[i, j + 1];
+                }
             }
-            else
+        }
+
+        #endregion
+
+        #region LVL2_ex_23 (tackle later)
+
+        static void LVL2_ex_23()
+        {
+            Matrix matrix1 = new Matrix(6, 6);
+            Matrix matrix2 = new Matrix(6, 6);
+            matrix1.CreateMatrix();
+            matrix2.CreateMatrix();
+            int numberOfMaxElements = 5;
+            List<(int, int)> elementsToChange1 = new List<(int, int)>(numberOfMaxElements);
+            List<(int, int)> elementsToChange2 = new List<(int, int)>(numberOfMaxElements);
+            List<(int, int)> alreadyMax1 = new List<(int, int)>();
+            List<(int, int)> alreadyMax2 = new List<(int, int)>();
+            Console.WriteLine("Matrix 1");
+            matrix1.Print();
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Matrix 2");
+            matrix2.Print();
+            Console.WriteLine("------------------------------------------");
+            for(int i = 0; i < numberOfMaxElements; i++)
             {
-                Console.WriteLine(false);
+                elementsToChange1.Add(Max(matrix1.CreatedMatrix, alreadyMax1));
             }
+            for (int i = 0; i < numberOfMaxElements; i++)
+            {
+                elementsToChange2.Add(Max(matrix2.CreatedMatrix, alreadyMax2));
+            }
+            ChangeMatrix(matrix1.CreatedMatrix, elementsToChange1);
+            ChangeMatrix(matrix2.CreatedMatrix, elementsToChange2);
+            Console.WriteLine("Matrix 1 (changed)");
+            matrix1.Print();
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Matrix 2 (changed)");
+            matrix2.Print();
+            Console.WriteLine("------------------------------------------");
+        }
 
-            // Carry out the logic (DRY + Incapsilation + Polymorphism in such small example)) - look in the head of program
-            Compare(numerator, denominator);
-            Compare(sum, average);
+        static (int, int) Max(int[,] matrix, List<(int, int)> list)
+        {
+            int max = -1000;
+            (int, int) indexOfMax = (0, 0);
+            (int, int) buffer = (0, 0);
+            for(int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for(int j = 0;j < matrix.GetLength(1); j++)
+                {
+                    buffer = (i, j);
+                    if (matrix[i, j] > max && list.Contains(buffer) == false)
+                    {
+                        max = matrix[i, j];
+                        indexOfMax = (i, j);   
+                    }
+                }
+            }
+            list.Add(indexOfMax);
+            return indexOfMax;
+        }
+        static void ChangeMatrix(int[,] list, List<(int, int)> indexes)
+        {
+            (int, int) tuple;
+            for (int i = 0; i < list.GetLength(0); i++)
+            {
+                for(int j = 0; j < list.GetLength(1); j++)
+                {
+                    tuple = (i, j);
+                    if (indexes.Contains(tuple) && list[i, j] > 0)
+                    {
+                        list[i, j] *= 2;
+                    }
+                    else if (indexes.Contains(tuple) && list[i, j] < 0)
+                    {
+                        list[i, j] /= 2;
+                    }
+                    else if(list[i, j] > 0)
+                    {
+                        list[i, j] /= 2;
+                    }
+                    else
+                    {
+                        list[i, j] *= 2;
+                    }
+                }
+            }
+        }
+        #endregion
 
-            #endregion
+        #region LVL3_ex_6
 
-            #region SOLID principles
+        static void LVL3_ex_6()
+        {
+            Matrix matrix = new Matrix(5, 5);
+            matrix.CreateMatrix();
+            Console.WriteLine("Initial matrix");
+            matrix.Print();
+            Console.WriteLine();
+            ReassembleColumns(matrix.CreatedMatrix, MaxOnDiagonal, MaxInFirstRow);
+            Console.WriteLine("Reassembled matrix");
+            matrix.Print();
+        }
 
-            /* single responsibility, open–closed, Liskov substitution, interface segregation и dependency inversion
-             * 
-             * S - Each class should keep everithing he need for work inside itself.
-             * O - Your program should be open for extentions but closed for changes. It is very difficlt to reach it, actually.
-             * L - Heirs should be able to use father's metods.
-             * I - Separate your program to interfaces and provide only what need in particular cases.
-             * D - One object shouldn't to talk another at the same level what to do. Use actions instead.
-             */
+        static void ReassembleColumns(int[,] matrix, MaxValue index1, MaxValue index2)
+        {
+            int buffer;
+            int indexOfMaxOnDiagonal = index1(matrix);
+            int indexOfMaxInRow = index2(matrix);
+            for(int i = 0; i < matrix.GetLength(0); i++)
+            {
+                buffer = matrix[i,indexOfMaxInRow];
+                matrix[i, indexOfMaxInRow] = matrix[i, indexOfMaxOnDiagonal];
+                matrix[i, indexOfMaxOnDiagonal] = buffer;
+            }
+        }
 
-            // We will work with SOLID closely at 7-8 & 10th labs.
+        static int MaxOnDiagonal(int[,] matrix)
+        {
+            int max = matrix[0, 0];
+            int maxIndex = 0;
+            for(int i = 0; i < matrix.GetLength(0); i++)
+            {
+                if (matrix[i, i] > max) { max = matrix[i, i]; maxIndex = i; }
+            }
+            return maxIndex;
+        }
 
-            #endregion
+        static int MaxInFirstRow(int[,] matrix)
+        {
+            int max = matrix[0, 0];
+            int maxIndex = 0;
+            for(int i = 0; i < matrix.GetLength(0); i++)
+            {
+                if (matrix[0, i] > max) { max = matrix[0, i]; maxIndex = i; }
+            }
+            return maxIndex;
+        }
+        delegate int MaxValue(int[,] matrix);
+        #endregion
 
-            #region Signature
-            /* Signature is a linguistic concept separate from the concept of syntax, which is also often related to attributes of computer programming languages.
-             * In c# for methods (and delegates) it includes full name (namespace, class(es), method name) and type, modificator (ref/out) and order of input parameters.
-             */
+        #region LVL3_ex_4
 
-            #endregion
+        static void LVL3_ex_4()
+        {
+            Matrix matrix = new Matrix(4, 4);
+            matrix.CreateMatrix();
+            double sum = SumSquared(matrix.CreatedMatrix, AssembleVector);
+            Console.WriteLine("Matrix");
+            matrix.Print();
+            Console.WriteLine();
+            Console.WriteLine($"Sum: {sum}");
+        }
+
+        static double SumSquared(int[,] matrix, Vector vector)
+        {
+            double sum = 0;
+            foreach(int i in vector(matrix, "Upper"))
+            {
+                sum += Math.Pow(i, 2);
+            }
+            return sum;
+        }
+
+        static int[] AssembleVector(int[,] matrix, string triangle)
+        {
+            List<int> vector = new List<int>();
+            if (triangle == "Lower")
+            {
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < i + 1; j++)
+                    {
+                        vector.Add(matrix[i, j]);
+                    }
+                }
+                return vector.ToArray();
+            }
+            else if (triangle == "Upper")
+            {
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = matrix.GetLength(1) - 1; j >= 0; j--)
+                    {
+                        vector.Add(matrix[i, j]);
+                    }
+                }
+                return vector.ToArray();
+            }
+            else return vector.ToArray();
+        }
+
+        delegate int[] Vector(int[,] matrix, string triangle);
+        #endregion
+    }
+
+    class Triangle
+    {
+        private int a;
+        private int b;
+        private int c;
+        private double area;
+        private int peremiter;
+
+        public int A
+        {
+            get
+            {
+                return a;
+            }
+            set
+            {
+                if (a < 0)
+                {
+                    throw new Exception("No negative numbers allowed");
+                }
+                else
+                {
+                    a = value;
+                }
+            }
+        }
+
+        public int B
+        {
+            get
+            {
+                return b;
+            }
+            set
+            {
+                if (b < 0)
+                {
+                    throw new Exception("No negative numbers allowed");
+                }
+                else
+                {
+                    b = value;
+                }
+            }
+        }
+
+        public int C
+        {
+            get
+            {
+                return c;
+            }
+            set
+            {
+                if (c < 0)
+                {
+                    throw new Exception("No negative numbers allowed");
+                }
+                else
+                {
+                    c = value;
+                }
+            }
+        }
+
+        public double Area
+        {
+            get
+            {
+                return area;
+            }
+            set
+            {
+                if (area < 0)
+                {
+                    throw new Exception("No negative numbers allowed");
+                }
+                else
+                {
+                    area = value;
+                }
+            }
+        }
+        public int Peremiter
+        {
+            get
+            {
+                return peremiter;
+            }
+            set
+            {
+                if (peremiter < 0)
+                {
+                    throw new Exception("No negative numbers allowed");
+                }
+                else
+                {
+                    peremiter = value;
+                }
+            }
+        }
+
+        public Triangle(int a, int b, int c)
+        {
+            if (a + b > c || a + c > b || b + c > a)
+            {
+                this.a = a;
+                this.b = b;
+                this.c = c;
+                peremiter = a + b + c;
+                area = Math.Sqrt(peremiter / 2 * (peremiter / 2 - a) * (peremiter / 2 - b) * (peremiter / 2 - c));
+            }
+            else Console.WriteLine("This triangle can't exist");
+        }
+    }
+
+    class Matrix
+    {
+        private int rows;
+        private int cols;
+        private int[,] matrix;
+
+        public int Rows
+        {
+            get { return rows; }
+            set 
+            {
+                if (rows <= 0) throw new Exception("Number of rows must be a positive integer");
+                else rows = value;
+            }
+        }
+        public int Cols
+        {
+            get { return cols; }
+            set
+            {
+                if (cols <= 0)
+                {
+                    throw new Exception("Number of rows must be a positive integer");
+                }
+                else cols = value;
+            }
+        }
+
+        public int[,] CreatedMatrix
+        {
+            get { if (matrix != null) return matrix; else throw new Exception("Matrix is empty"); }
+            set
+            {
+                if (matrix == null)
+                {
+                    throw new Exception("Matrix is empty");
+                }
+                else matrix = value;
+            }
+        }
+        public Matrix(int rows, int cols)
+        {
+            this.rows = rows;
+            this.cols = cols;
+            matrix = new int[rows, cols];
+        }
+
+        public void CreateMatrix()
+        {
+            int seed = DateTime.Now.Second;
+            Random r = new Random(seed);
+            for(int i = 0; i < rows; i++)
+            {
+                for(int j = 0; j < cols; j++)
+                {
+                    matrix[i, j] = r.Next(0, 9);
+                }
+            }
+        }
+
+        public void Print()
+        {
+            for(int i = 0; i < rows; i++)
+            {
+                for(int j = 0; j < cols; j++)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
